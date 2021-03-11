@@ -1,4 +1,4 @@
-const db      = require('./mods/db');
+import * as db from './db';
 
 // small utility script to clean the database from data
 async function cleanMe() {

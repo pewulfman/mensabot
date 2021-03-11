@@ -1,6 +1,6 @@
-const sqlite3 = require('sqlite3');
-const util    = require('util')
-const log     = require('./log');
+import * as sqlite3 from 'sqlite3';
+import * as util    from 'util'
+import * as log     from '../discord/log';
 
 // this is the db module using sqlite3
 // add this dependency to package.json if you use it:

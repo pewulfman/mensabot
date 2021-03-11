@@ -1,19 +1,18 @@
 const Discord = require('discord.js');
-const client  = new Discord.Client({ ws: { intents: Discord.Intents.ALL }});
-const conf    = require('../configs');
-const db      = require('./db');
+const conf    = require('../configs.ts');
+const db      = require('../mysql/db');
 const fs      = require('fs');
 const log     = require('./log');
 const puppeteer  = require('puppeteer');
 const cheerio    = require('cheerio');
 const nodemailer = require('nodemailer');
 
-const bot = {};
+const client  = new Discord.Client({ ws: { intents: Discord.Intents.ALL }});
 
-bot.isProcessingNewMember = false;
+export var isProcessingNewMember = false;
 
 client.once('ready', () => {
-    log.debug('Bot is connected to Discord');
+    log.debug(`${client.user.tag} is connected to Discord`);
 
     // loop on my guilds
     client.guilds.cache.forEach(processOneGuild);
@@ -92,7 +91,7 @@ async function reMember(member) {
 
 
 // welcome new users
-bot.welcome = async function() {
+export async function welcome() {
     // we look for a new user
     const newUser = await db.getOne("select cast(did as char) as did, discord_name from users where state = 'new' limit 1", []);
 
@@ -238,7 +237,7 @@ async function handleIncomingMessage(message) {
  * We get one member that should receive a validation code
  * and process it
  */
-bot.sendCode = async function() {
+export async function sendCode() {
     // log.debug("Any new user?");
     const newUser = await db.getOne(
        `select cast(did as char) as did
@@ -467,7 +466,7 @@ function sendValidationCode(rowUser, discordUser) {
 /**
  * We give the discord roles to all who deserve it
  */
-bot.promote = async function() {
+export async function promote() {
     // we fetch all roles that should be added to the member
     let sql = `
     select cast(guilds.gid         as char) as gid,
@@ -560,6 +559,7 @@ async function giveRoleToMember(row) {
 }
 
 
-bot.connect = function() { client.login(conf.botToken); }
+export function connect() { 
+    client.login(conf.botToken); 
+}
 
-module.exports = bot;

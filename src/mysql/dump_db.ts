@@ -1,6 +1,5 @@
-const util = require('util');
-const conf = require('./configs');
-
+import * as util from 'util';
+import {configs as conf} from '../configs';
 const exec = util.promisify(require('child_process').exec);
 
 

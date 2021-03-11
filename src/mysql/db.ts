@@ -1,9 +1,7 @@
-"use strict"
-
-const mysql = require('mysql')
-const util  = require('util')
-const log   = require('./log')
-const conf  = require('../configs')
+import * as mysql from  'mysql'
+import * as util  from  'util'
+import * as log   from  '../discord/log'
+import {configs as conf}  from  '../configs'
 
 let pool = mysql.createPool({
 	connectionLimit: 10,
@@ -15,7 +13,8 @@ let pool = mysql.createPool({
 	timezone : 'Z'
 })
 
-pool.getConnection((err, connection) => {
+class Pool {
+  function getConnection((err, connection) => {
     if (err) {
         if (err.code === 'PROTOCOL_CONNECTION_LOST') {
             console.error('Database connection was closed.')
@@ -26,14 +25,15 @@ pool.getConnection((err, connection) => {
         if (err.code === 'ECONNREFUSED') {
             console.error('Database connection was refused.')
         }
-        log.error(err.message)
+        log.error(err.message,err)
     }
     if (connection) {
       log.debug('Connected to the chatbot database.')
       connection.release()
     }
     return
-})
+  })
+}
 
 pool.query = util.promisify(pool.query)
 

@@ -1,4 +1,4 @@
-const bot = require('./mods/bot.js');
+const bot = require('./discord/bot.ts');
 
 
 // we connect to Discord

@@ -2,10 +2,10 @@
 
 A Discord bot for Mensa-France.
 
-Original Mensa-PLO bot Discord ID: 719154428355018813
+Forked from [Mensa-PLO bot](https://github.com/slesolliec/mensabot)
 
 To invite the bot in your server, go to 
-https://discord.com/oauth2/authorize?client_id=719154428355018813&scope=bot
+https://discord.com/oauth2/authorize?client_id=819258671107407903&scope=bot
 
 This is currently a test ground for playing with nodeJS and Discord.
 
@@ -14,7 +14,7 @@ This is currently a test ground for playing with nodeJS and Discord.
 
 Here a the main modules used in this small application:
 
-1. [sqlite3](https://www.npmjs.com/package/sqlite3). Tutorials: [SQLite Node](https://www.sqlitetutorial.net/sqlite-nodejs/)
+1. [Mysql](). 
 1. [Discord.js](https://discord.js.org/)
 1. [Puppeteer](https://pptr.dev/). (Maybe for later: [How to set up a Headless Chrome Node.js server inside a docker container](https://blog.logrocket.com/how-to-set-up-a-headless-chrome-node-js-server-in-docker/)
 

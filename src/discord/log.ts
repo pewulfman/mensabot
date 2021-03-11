@@ -1,10 +1,9 @@
 const colors = require('colors/safe');
 const moment = require('moment');
 
-var conf = require('../configs');
+const conf = require('../configs.ts');
 
 // that object will be exported (commonJS module patern)
-var log = {}
 
 
 // gives memory used in Mega-Bytes
@@ -19,25 +18,23 @@ function logger(msg) {
 }
 
 
-log.msgout = function(to, msg) {
+export function msgout(to, msg) {
     logger(colors.green('[>> ' + to + ']') + ' ' + msg);
 }
 
-log.msgin = function(from, msg) {
+export function msgin(from, msg) {
     logger(colors.yellow('[' + from + ' >>]') + ' ' + msg);
 }
 
-log.debug = function (msg) {
+export function debug (msg) {
 	logger(colors.cyan(msg));
 }
 
-log.warning = function (msg) {
+export function warning (msg) {
 	logger( colors.yellow("[WARNING] ") + msg);
 }
 
-log.error = function (msg, e) {
+export function error (msg, e) {
 	// console.log(e);
 	logger( colors.bold.red("[ERROR] ") + msg + (e || ''));
 }
-
-module.exports = log;
