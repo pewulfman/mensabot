@@ -1,25 +1,27 @@
+function assert_exist<T> (arg : T | undefined) : T {
+	if (!arg) {
+		console.log (arg + "is undefined")
+		process.exit();
+	}
+	else return arg
+}
+
 export const configs = {
-	botToken: process.env.BOT_TOKEN,
-	mysql: {
-		host: '127.0.0.1',
-		user: 'mensabot',
-		password: '***',
-		database: 'mensabot'
-	},
+	botToken: assert_exist (process.env.BOT_TOKEN),
 	botAdmin: {
-		name:  process.env.ADMIN_NAME,
-		email: process.env.ADMIN_MAIL
+		name:  assert_exist (process.env.ADMIN_NAME),
+		email: assert_exist (process.env.ADMIN_MAIL),
 	},
 	mensa_fr_db : {
-		userid:   process.env.MENSA_ID,
-		password: process.env.MENSA_PASSWORD,
+		userid:   assert_exist (process.env.MENSA_ID),
+		password: assert_exist (process.env.MENSA_PASS),
 		headless: true,
-		url:      process.env.MENSA_URL
+		url:      assert_exist (process.env.MENSA_URL)
 	},
 	mensa_inter_db : {
-		userid:   process.env.MENSA_INTER_ID,
-		password: process.env.MENSA_INTER_PASS,
-		url :     process.env.MENSA_INTER_URL
+		userid:   assert_exist (process.env.MENSA_INTER_ID),
+		password: assert_exist (process.env.MENSA_INTER_PASS),
+		url :     assert_exist (process.env.MENSA_INTER_URL)
 	}
 }
 

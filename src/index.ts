@@ -1,4 +1,4 @@
-const bot = require('./discord/bot.ts');
+import * as bot from './discord/bot'
 
 
 // we connect to Discord

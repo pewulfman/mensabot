@@ -14,12 +14,23 @@ This is currently a test ground for playing with nodeJS and Discord.
 
 Here a the main modules used in this small application:
 
-1. [Mysql](). 
 1. [Discord.js](https://discord.js.org/)
-1. [Puppeteer](https://pptr.dev/). (Maybe for later: [How to set up a Headless Chrome Node.js server inside a docker container](https://blog.logrocket.com/how-to-set-up-a-headless-chrome-node-js-server-in-docker/)
+1. [Prisma](https://www.prisma.io/) (ORM for postgres)
+1. [Needle](https://www.npmjs.com/package/needle) and [Cheerio](https://www.npmjs.com/package/cheerio) (Tools for web request)
 
+## TODO List
 
-## Liste des trucs à faire
+### UC001: Clean up the authentification
+1. rework chatbot
+1. small server to receive verification code
+1. Following mensa membership to promote and demote user
+1. replace logger
+
+### UC002: Support international members
+1. Write bilingual messages
+1. Chatbot detect for inter or french member
+1. crawler for mensa inter
+1. Add abstraction layer to call the correct crawler
 
 ### UC001: authentifier un membre Mensa sur Discord
 
@@ -51,14 +62,6 @@ Ca c'est pour facilité le fait de pouvoir retrouver les gens qu'on connait derr
 ### UC003: administration 
 
 1. Demander à l'administrateur d'un serveur le nom du rôle de membre Mensa
-
-
-### getting Puppetter to work on RaspBerry
-
-The headless chrome that comes with Puppetter via npm does not work on RaspBerry.
-
-1. You need to install Chrome first: sudo apt-get install chromium-browser --yes
-1. Then instanciate the brower with: const browser = await puppeteer.launch({headless: true, executablePath: 'chromium-browser'});
 
 
 ### some more links
