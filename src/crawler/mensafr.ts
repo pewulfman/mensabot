@@ -43,7 +43,7 @@ function isActive (html : cheerio.Cheerio) {
     throw new Error("unknown color")
 }
 
-export async function getMemberInfo(mensaTag:string, cookies : any) {
+export async function getMemberInfo(mensaTag:number, cookies : any) {
 
     log.debug("Getting info of member " + mensaTag);
 

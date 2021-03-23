@@ -1,11 +1,11 @@
 import * as Discord from 'discord.js'
 import {configs as conf} from '../configs'
-import * as db         from '../mysql/db'
 import * as fs         from 'fs'
 import * as log        from './log'
 import * as nodemailer from 'nodemailer'
 import { PrismaClient } from '.prisma/client'
 import { members } from '.prisma/client'
+import * as mensafr from '../crawler/mensafr'
 
 const client : Discord.Client = new Discord.Client({ ws: { intents: Discord.Intents.ALL }});
 const prisma = new PrismaClient();
@@ -175,11 +175,22 @@ async function handleIncomingMessage(message : Discord.Message, bot : Discord.Cl
             return;
         }
 
-        pendingMember = getMemberInfo (mensaTag);
-        new_code      = create_new_code();
-        sendCode (pendingMember,new_code);
+        const memberInfo = await mensafr.getMemberInfo (mensaTag,undefined);
+        const new_code   = create_new_code();
+        sendCode (memberInfo.email,member.mensaTag,new_code);
         // we store the user in the pending member
-        prisma.pendingMembers.create (data:{pendingMember});
+        prisma.pendingMembers.create ({
+            data:{
+                name : memberInfo.name,
+                email : memberInfo.email,
+                region : memberInfo.region,
+                mensaTag,
+                discordTag : message.author.id,
+                membership : memberInfo.membership,
+                code : new_code,
+                trials : 0,
+                inter : false
+            }});
 
         sendDirectMessage(message.author, "J'ai bien enregistré ton numéro d'adhérant: **" + mensaTag + "**"
             + "\nMerci de patienter pendant que je vérifie ton identité dans l'annuaire de l'association.");
@@ -209,10 +220,12 @@ async function handleIncomingMessage(message : Discord.Message, bot : Discord.Cl
             await prisma.members.create ({
                 data: {
                     name : pendingMember.name,
-                    firstname : pendingMember.firstname ,
+                    email : pendingMember.email,
+                    region : pendingMember.region,
                     mensaTag  : pendingMember.mensaTag,
                     discordTag : pendingMember.discordTag,
                     membership : pendingMember.membership,
+                    inter : pendingMember.inter
                 }
             })
             
