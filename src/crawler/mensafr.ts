@@ -45,10 +45,10 @@ function isActive (html : cheerio.Cheerio) {
 
 export async function getMemberInfo(mensaTag:number, cookies : any) {
 
-    log.debug("Getting info of member " + mensaTag);
+    //log.debug("Getting info of member " + mensaTag);
 
     const infoPageUrl = conf.mensa_fr_db.url + mensaTag;
-    log.debug("  Going to " + infoPageUrl);
+    //log.debug("  Going to " + infoPageUrl);
     if (cookies == undefined) {
         cookies = getAuthCookies();
     }

@@ -21,10 +21,10 @@ Here a the main modules used in this small application:
 ## TODO List
 
 ### UC001: Clean up the authentification
-1. rework chatbot
-1. small server to receive verification code
-1. Following mensa membership to promote and demote user
-1. replace logger
+~~1. rework chatbot~~
+~~1. small server to receive verification code~~
+~~1. Following mensa membership to promote and demote user~~
+~~1. replace logger~~
 
 ### UC002: Support international members
 1. Write bilingual messages
@@ -32,6 +32,7 @@ Here a the main modules used in this small application:
 1. crawler for mensa inter
 1. Add abstraction layer to call the correct crawler
 
+### UC003! Support for facebook
 ### UC001: authentifier un membre Mensa sur Discord
 
 1. ~~Créer le bot sur discord~~

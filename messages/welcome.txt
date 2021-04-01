@@ -1,4 +1,4 @@
-Bonjour **##username##** et bienvenue sur le serveur M's PLO,
+Bonjour **##username##** et bienvenue sur le serveur ##guild##,
 
 Je suis le robot chargé de vérifier l'appartenance des nouveaux arrivants à l'association.
 

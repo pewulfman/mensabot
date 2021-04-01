@@ -1,12 +1,8 @@
 Bonjour ##real_name##,
 
-Voici votre code de confirmation pour montrer au serveur Discord de Mensans que vous êtes bien un membre :
+Voici votre lien de confirmation pour vérifier que vous êtes bien membre de mensa:
+##validationUrl##
 
-##validationCode##
-
-Il vous suffit maintenant d'envoyer ce code au bot Discord en Message Privé
-
-Merci
 
 -- 
 MensaBot
