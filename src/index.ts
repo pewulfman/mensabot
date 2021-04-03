@@ -20,12 +20,14 @@ client.login(configs.botToken);
  */
 import * as express from 'express';
 import { PORT } from './server/config/constants';
-import { validationRouter } from './server/routes';
+import { validationRouter, setupRouter, rootRouter } from './server/routes';
 
 const app = express();
 app.use(express.json());
 
 app.use(configs.server.validation_path, validationRouter);
+app.use('/setup', setupRouter);
+app.use('/', rootRouter);
 
 
 app.listen(PORT, () => {
