@@ -17,16 +17,17 @@ Here a the main modules used in this small application:
 1. [Discord.js](https://discord.js.org/)
 1. [Prisma](https://www.prisma.io/) (ORM for postgres)
 1. [Needle](https://www.npmjs.com/package/needle) and [Cheerio](https://www.npmjs.com/package/cheerio) (Tools for web request)
+1. [Sentry](https://sentry.io/welcome/) (Record server error)
 
 ## TODO List
 
 ### UC001: Clean up the authentification
-~~1. rework chatbot~~
-~~1. small server to receive verification code~~
-~~1. Following mensa membership to promote and demote user~~
+1. ~~rework chatbot~~
+1. ~~ small server to receive verification code~~
+1. ~~ Following mensa membership to promote and demote user~~
 1. Make setting up flow
 1. replace logger
-
+1. Write Maintenance Task (Check everyday for promotion and demotion)
 ### UC002: Support international members
 1. Write bilingual messages
 1. Chatbot detect for inter or french member

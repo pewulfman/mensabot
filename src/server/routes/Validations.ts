@@ -10,8 +10,8 @@ router.post('/', (req: Request, res: Response) => {
 });
 */
 
-router.get('/', (req: Request, res: Response) => {
-    validationController.read(req, res);
+router.get('/', (req: Request, res: Response, next) => {
+    validationController.read(req, res).catch (next);
 });
 /**
 router.patch('/', (req: Request, res: Response) => {

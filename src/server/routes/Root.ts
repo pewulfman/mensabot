@@ -10,8 +10,8 @@ router.post('/', (req: Request, res: Response) => {
 });
 */
 
-router.get('/', (req: Request, res: Response) => {
-    rootController.read(req, res);
+router.get('/', (req: Request, res: Response, next) => {
+    rootController.read(req, res).catch(next);
 });
 /**
 router.patch('/', (req: Request, res: Response) => {
