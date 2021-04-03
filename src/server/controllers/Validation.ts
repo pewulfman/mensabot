@@ -1,43 +1,55 @@
-import { PrismaClient } from '.prisma/client';
 import { Request, Response } from 'express';
 import { CrudController } from './CrudController';
 import * as discord from '../../discord';
 
-const prisma = new PrismaClient ();
+import { prisma } from '../../postgre';
+
 export class ValidationController extends CrudController {
     public create(_req: Request<import("express-serve-static-core").ParamsDictionary>, _res: Response): void {
         throw new Error("Method not implemented.");
     }
 
     public async read(req: Request<import("express-serve-static-core").ParamsDictionary>, res: Response): Promise<void> {
-        let mensaTagS = req.query.mid;
+        let mensaIdS = req.query.mid;
         let code     = req.query.code;
-        if ((typeof mensaTagS) != typeof "" || typeof code != typeof "") {}
-        let mensaTag = parseInt (mensaTagS as string);
-        let pending = await prisma.pendingMembers.findUnique ({where:{mensaTag}})
-        if (!pending) { throw Error ()};
-        if (pending.code != code) { //invalid code, retry or contact
+        console.log (`validating user ${mensaIdS} with code ${code}`)
+        if ((typeof mensaIdS) != typeof "" || typeof code != typeof "") {
+            res.send (`invalid input`);
+            return
         }
+        let mensaId = parseInt (mensaIdS as string);
+        code    = code as string;
+        console.log (`MensaId is ${mensaId}`);
+
+        let pending = (await prisma.pendingMembers.findMany ({where:{AND:[{mensaId},{code},],}})).pop();
+        if (!pending) {
+            res.send (`Code invalide.
+                       Si vous n'étes pas déjà authentifier et que le problème persiste, recommence la procédure de zéro, puis contacte l'administrateur`);
+            return;
+        };
         
         // Validating user
 
         //move to members table
-        prisma.members.create ({
+        await prisma.members.create ({
             data: {
                 name       : pending.name,
                 email      : pending.email,
                 region     : pending.region,
-                mensaTag   : pending.mensaTag,
+                mensaId    : pending.mensaId,
+                discordId  : pending.discordId,
                 discordTag : pending.discordTag,
                 membership : pending.membership,
                 inter      : pending.inter
             }
         })
-        prisma.pendingMembers.delete ({where:{id:pending.id}});
+        await prisma.pendingMembers.delete ({where:{id:pending.id}});
 
+        console.log (`is member : ${pending.membership}`);
         //promote users
         if (pending.membership) { 
-            discord.roles.promote(pending.discordTag)
+            console.log ('membership true');
+            discord.roles.promote(pending.discordId,pending.discordTag)
             res.send("Ton identité à été validé, tu devrais maintenant avoir accées aux contenu des discords")
         } else {
             res.send("Ton identité à été validé, cependant tu n'es pas à jour de cotisation. Tu auras accés au serveur quand tu recotisera")

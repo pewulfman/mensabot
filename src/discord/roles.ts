@@ -2,6 +2,7 @@ import * as Discord from 'discord.js'
 
 import { client } from './client'
 import { prisma } from '../postgre'
+import { guild } from '.prisma/client';
 
 
 /**
@@ -9,33 +10,40 @@ import { prisma } from '../postgre'
  */
 
 
-export async function promote(discordTag:string) {
+export async function promote(discordId : string, discordTag:string) {
 
-    let user = await client.users.fetch (discordTag); // Todo: get user from discordTag
+    console.log (`Promoting user ${discordTag}`)
 
+    let user = await client.users.resolve (discordId);
+    console.log (user);
+    if (user == null) console.log (`user not found`)
     // get list of guild the user is part of.
     let guild_lst = client.guilds.cache.filter (
-        guild => guild.members.resolve (user) != null
+        guild => guild.members.resolve (user!) != null
     ).keyArray ()
+    console.log(guild_lst);
 
     // we fetch all roles that we know
-    let guilds_info = await prisma.guild.findMany({select:{discordTag:true,roleTag:true},where:{discordTag:{in : guild_lst}}});
+    let guilds_info = await prisma.guild.findMany({where:{discordId:{in : guild_lst}}});
 
     // log.debug(roles);
-    guilds_info.map(guild_info => promoteInGuild(user,guild_info) );
+    guilds_info.map(guild_info => promoteInGuild(user!,guild_info) );
 }
 
-async function promoteInGuild(user:Discord.User,guild_info:{discordTag:string,roleTag:string}) {
+async function promoteInGuild(user:Discord.User,guild_info:guild) {
 
-    const guild = await client.guilds.fetch(guild_info.discordTag);
+    console.log (`Give roles ${guild_info.roleTag} to user ${user.username} in server ${guild_info.discordId}`)
+    const guild = await client.guilds.fetch(guild_info.discordId);
     if (! guild) {
         //log.error("Error404: Guild " + guild_info.discordTag + " not found !!!",guild);
+        console.log (`Guild ${guild_info.name} not found`)
         return;
     }
 
     const member = await guild.members.fetch(user.id);
     if (! member) {
         //log.error("Error404: Member " + user.id + " not found in guild " + guild.name,member);
+        console.log (`Member ${user.username} not in guild ${guild_info.name}`)
         return;
     }
     // console.log('=== The Member ===\n', member);
@@ -43,14 +51,15 @@ async function promoteInGuild(user:Discord.User,guild_info:{discordTag:string,ro
     // check if bot hasPermission(['MANAGE_ROLES'])
     const bot_in_guild = guild.me;
     if ( ! bot_in_guild) {throw Error}
-    else if ( ! bot_in_guild.hasPermission('MANAGE_ROLES')) {
-        //log.error("Bot doesn't have role permissions on server " + guild.name, guild);
+    else if ( ! bot_in_guild.hasPermission(['MANAGE_ROLES'])) {
+        console.log (`Bot doesn't have permission on server ${guild_info.name}`)
         return;
     }
 
     const discordRole = await guild.roles.fetch(guild_info.roleTag);
     if (! discordRole) {
         //log.error("Role " + guild_info.roleTag + " not found in guild " + guild.name,guild);
+        console.log (`Role ${guild_info.roleTag} not found in guild`)
         return;
     }
     // console.log('=== The Role ===\n', discordRole);
@@ -71,15 +80,15 @@ export async function demote(discordTag:string) {
     ).keyArray ()
 
     // we fetch all roles that we know
-    let guilds_info = await prisma.guild.findMany({select:{discordTag:true,roleTag:true},where:{discordTag:{in : guild_lst}}});
+    let guilds_info = await prisma.guild.findMany({select:{discordId:true,roleTag:true},where:{discordId:{in : guild_lst}}});
 
     // log.debug(roles);
     guilds_info.map(guild_info => demoteInGuild(user,guild_info) );
 }
 
-async function demoteInGuild(user:Discord.User,guild_info:{discordTag:string,roleTag:string}) {
+async function demoteInGuild(user:Discord.User,guild_info:{discordId:string,roleTag:string}) {
 
-    const guild = await client.guilds.fetch(guild_info.discordTag);
+    const guild = await client.guilds.fetch(guild_info.discordId);
     if (! guild) {
         //log.error("Error404: Guild " + guild_info.discordTag + " not found !!!",guild);
         return;

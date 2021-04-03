@@ -5,7 +5,7 @@ A Discord bot for Mensa-France.
 Forked from [Mensa-PLO bot](https://github.com/slesolliec/mensabot)
 
 To invite the bot in your server, go to 
-https://discord.com/oauth2/authorize?client_id=819258671107407903&scope=bot
+https://discord.com/api/oauth2/authorize?client_id=819258671107407903&permissions=8&scope=bot
 
 This is currently a test ground for playing with nodeJS and Discord.
 
@@ -24,7 +24,8 @@ Here a the main modules used in this small application:
 ~~1. rework chatbot~~
 ~~1. small server to receive verification code~~
 ~~1. Following mensa membership to promote and demote user~~
-~~1. replace logger~~
+1. Make setting up flow
+1. replace logger
 
 ### UC002: Support international members
 1. Write bilingual messages

@@ -17,14 +17,17 @@ const transporter = nodemailer.createTransport({
 export function sendValidationUrl(name : string, email : string, url :string) {
     // send the email with validation code
 
+
     const msgMail = fs.readFileSync('./messages/email_validation_code.txt', 'utf-8')
         .replace(/##real_name##/g,      name)
         .replace(/##validationUrl##/g,  url)
         .replace(/##botAdminName##/g,   conf.botAdmin.name)
         .replace(/##botAdminEmail##/g,  conf.botAdmin.email);
 
+    console.log (`message sent : ${msgMail}`);
+
     const mailOptions = {
-        from:    'MensaBot <' + conf.botAdmin.email + '>',
+        from:    'MensaBot <' + conf.smtp.user + '>',
         to:      email,
         subject: 'Votre code de confirmation MensaBot Discord',
         text:    msgMail
@@ -32,6 +35,7 @@ export function sendValidationUrl(name : string, email : string, url :string) {
       
     transporter.sendMail(mailOptions, function(error, info){
         if (error) {
+            console.log (error);
             throw Error ();
         } else {
             console.log('Email sent: ' + info.response);

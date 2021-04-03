@@ -2,7 +2,7 @@
 import {configs as conf} from '../configs'
 
 import * as cheerio    from 'cheerio'
-import needle = require('needle');
+import * as needle     from 'needle'
 
 async function getToken () : Promise<string | undefined> {
     const resp =
@@ -18,6 +18,7 @@ async function getToken () : Promise<string | undefined> {
 }
 
 async function getAuthCookies () {
+    console.log ("geting cookie");
     const token = await getToken ();
     const resp = 
         await needle("post","https://auth.mensa-france.net/",
@@ -43,20 +44,26 @@ function isActive (html : cheerio.Cheerio) {
     throw new Error("unknown color")
 }
 
-export async function getMemberInfo(mensaTag:number, cookies : any) {
+export async function getMemberInfo(mensaId:number, cookies : any | undefined) {
 
-    //log.debug("Getting info of member " + mensaTag);
+    console.log ("Getting info for member :" + mensaId)
 
-    const infoPageUrl = conf.mensa_fr_db.url + mensaTag;
-    //log.debug("  Going to " + infoPageUrl);
+    const infoPageUrl = conf.mensa_fr_db.url + mensaId;
+    
     if (cookies == undefined) {
-        cookies = getAuthCookies();
+        console.log ("cookies unknown")
+        cookies = await getAuthCookies();
+        console.log ("new cookies " + cookies);
     }
     try {
+        console.log ("Get : " + infoPageUrl);
         let resp = await needle ("get", infoPageUrl,{cookies});
+        console.log ("response" + resp.statusCode)
         const $ = cheerio.load(resp.body);
-        let identity = $('#identity').text().match(/(?:Monsieur|Madame) (?P<name>[a-zA-Z- ]+) - [0-9]+ - (?P<region>[A-Z]+)/);
-        if (!identity) {throw new Error ()}
+        let identity = $('#identite').text().match(/(?:Monsieur|Madame) (?<name>[a-zA-Z- ]+) - [0-9]+ - (?<region>[A-Z]+)/);
+        if (!identity) {
+            throw new Error ()
+        }
         let name = identity.groups!['name'];
         let region = identity.groups!['region'];
         let email = $('div.email a').text();

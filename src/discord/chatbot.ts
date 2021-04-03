@@ -27,14 +27,15 @@ export async function handleIncomingMessage(message : Message) {
 
     // Check if this is an authentified user
     const theUser = await prisma.members.findUnique ({
-        where : {discordTag : message.author.id}});
+        where : {discordTag : message.author.tag}});
 
     if (theUser) {
         message.author.send("Bonjour, je vous ai déjà authentifier, je n'ai plus rien à faire");
+        return;
     }
 
     const pendingMember = await prisma.pendingMembers.findUnique ({
-        where : {discordTag : message.author.id}});
+        where : {discordTag : message.author.tag}});
 
     // check if this is a user waiting for authentification
     if (pendingMember) {
@@ -42,9 +43,9 @@ export async function handleIncomingMessage(message : Message) {
     }
     
     // Unknow member, waiting for a mensa member
-    const mensaTag = parseInt(message.content);
+    const mensaId = parseInt(message.content);
     // we are expecting the number
-    if (isNaN(mensaTag) || (mensaTag < 1)) {
+    if (isNaN(mensaId) || (mensaId < 1)) {
         message.author.send("Je m'attendais à votre numéro de Mensan. Pourriez-vous me le donner ?");
         return;
     }
@@ -52,13 +53,13 @@ export async function handleIncomingMessage(message : Message) {
 
     // check if we already have that number
     const checkUser = await prisma.members.findUnique ({
-        where: {mensaTag}
+        where: {mensaId}
     });
     if (checkUser) {
-        if (checkUser.discordTag == message.author.id) {
+        if (checkUser.discordTag == message.author.tag) {
             //Weird case since we didn't find checkUser using his Tag
             message.author.send ("Vous êtes déjà authentifié");
-            prisma.pendingMembers.delete ({where:{mensaTag}})
+            prisma.pendingMembers.delete ({where:{mensaId}})
             return;
         }
         message.author.send("Un autre utilisateur est déjà authentifier avec ce numero. S'il y a un soucis, veuillez contacter un administrateur");
@@ -67,19 +68,20 @@ export async function handleIncomingMessage(message : Message) {
 
 
 
-    const memberInfo = await mensafr.getMemberInfo (mensaTag,undefined);
+    const memberInfo = await mensafr.getMemberInfo (mensaId,undefined);
     const new_code   = generateCode () ;
-    const new_url    = generateUrl (mensaTag,new_code);
+    const new_url    = generateUrl (mensaId,new_code);
     sendValidationUrl (memberInfo.name,memberInfo.email,new_url);
 
     // we store the user in the pending member
-    prisma.pendingMembers.create ({
+    await prisma.pendingMembers.create ({
         data:{
             name : memberInfo.name,
             email : memberInfo.email,
             region : memberInfo.region,
-            mensaTag,
-            discordTag : message.author.id,
+            mensaId,
+            discordId  : message.author.id,
+            discordTag : message.author.tag,
             membership : memberInfo.membership,
             code : new_code,
             trials : 0,
@@ -92,15 +94,17 @@ export async function handleIncomingMessage(message : Message) {
 
 
 export async function reMember(member : GuildMember) {
+
+    console.log (`welcoming user ${member.user.tag}`);
     // we don't care about bots
     if (member.user.bot) return;
 
     // check we know that user
-    let theUser = await prisma.members.findUnique({where:{discordTag:member.user.id}});
+    let theUser = await prisma.members.findUnique({where:{discordId:member.user.id}});
     if (theUser) return;
 
     const message = fs.readFileSync('./messages/welcome.txt', 'utf-8')
-        .replace(/##username##/g, member.nickname || 'anonymous')
+        .replace(/##username##/g, member.user.username)
         .replace(/##guild##/g,    member.guild.name)
 
     member.send (message);
