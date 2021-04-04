@@ -1,4 +1,5 @@
 import * as Discord from 'discord.js'
+import * as Sentry from "@sentry/node";
 
 import { client } from './client'
 import { prisma } from '../postgre'
@@ -46,15 +47,6 @@ async function promoteInGuild(user:Discord.User,guild_info:guild) {
         console.log (`Member ${user.username} not in guild ${guild_info.name}`)
         return;
     }
-    // console.log('=== The Member ===\n', member);
-
-    // check if bot hasPermission(['MANAGE_ROLES'])
-    const bot_in_guild = guild.me;
-    if ( ! bot_in_guild) {throw Error}
-    else if ( ! bot_in_guild.hasPermission(['MANAGE_ROLES'])) {
-        console.log (`Bot doesn't have permission on server ${guild_info.name}`)
-        return;
-    }
 
     const discordRole = await guild.roles.fetch(guild_info.roleTag);
     if (! discordRole) {
@@ -63,11 +55,15 @@ async function promoteInGuild(user:Discord.User,guild_info:guild) {
         return;
     }
     // console.log('=== The Role ===\n', discordRole);
-        
-    member.roles.add(discordRole)
-        .then(() => {
-            member.send ("Je viens de vous donner le rôle **" + discordRole.name + "** sur le serveur **" + guild.name + "**");
-        });        
+    try {
+        member.roles.add(discordRole)
+            .then(() => {
+                member.send ("Je viens de vous donner le rôle **" + discordRole.name + "** sur le serveur **" + guild.name + "**");
+            });        
+    } catch (e) {
+        let id = Sentry.captureException(e);
+        guild.owner?.send(`Error trying to give role to member. be sure that I have the "give role" permission and that my role is above the "<auth>" role that I should give. If the problem persist, contact the admin and give the error ${id}`)
+    }
 }
 
 export async function demote(discordTag:string) {

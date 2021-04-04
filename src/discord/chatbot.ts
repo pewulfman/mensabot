@@ -1,4 +1,5 @@
-import {GuildMember, Message} from 'discord.js'
+import {GuildMember, Message, Guild} from 'discord.js'
+import * as Sentry from "@sentry/node";
 import * as mensafr from '../crawler/mensafr'
 import * as fs         from 'fs'
 
@@ -7,6 +8,11 @@ import { prisma } from '../postgre'
 import { sendValidationUrl } from '../mailer';
 import { generateCode, generateUrl } from '../auth';
 
+
+export async function newGuild (guild : Guild) {
+    const message = fs.readFileSync('./messages/newGuild.txt', 'utf-8');
+    guild.owner?.send(message);
+}
 
 export async function handleIncomingMessage(message : Message) {
     const bot = client.user;
@@ -67,33 +73,38 @@ export async function handleIncomingMessage(message : Message) {
     }
 
 
+    try {
+        const memberInfo = await mensafr.getMemberInfo (mensaId,undefined);
+        const new_code   = generateCode () ;
+        const new_url    = generateUrl (mensaId,new_code);
+        sendValidationUrl (memberInfo.name,memberInfo.email,new_url);
 
-    const memberInfo = await mensafr.getMemberInfo (mensaId,undefined);
-    const new_code   = generateCode () ;
-    const new_url    = generateUrl (mensaId,new_code);
-    sendValidationUrl (memberInfo.name,memberInfo.email,new_url);
+        // we store the user in the pending member
+        await prisma.pendingMembers.create ({
+            data:{
+                name : memberInfo.name,
+                email : memberInfo.email,
+                region : memberInfo.region,
+                mensaId,
+                discordId  : message.author.id,
+                discordTag : message.author.tag,
+                membership : memberInfo.membership,
+                code : new_code,
+                trials : 0,
+                inter : false
+            }});
 
-    // we store the user in the pending member
-    await prisma.pendingMembers.create ({
-        data:{
-            name : memberInfo.name,
-            email : memberInfo.email,
-            region : memberInfo.region,
-            mensaId,
-            discordId  : message.author.id,
-            discordTag : message.author.tag,
-            membership : memberInfo.membership,
-            code : new_code,
-            trials : 0,
-            inter : false
-        }});
+        message.author.send("J'ai bien enregistrer ta demande. Tu devrais recevoir un mail contenant un lien pour finaliser ton authentification");
+        return;
+    } catch (err) {
+        let id = Sentry.captureException(err);
+        message.author.send(`Il y a eu un soucis. Re-essaie et si ça persiste, tu peux contacter les admins en renseignant l'erreur ${id}`);
 
-    message.author.send("J'ai bien enregistrer ta demande. Tu devrais recevoir un mail contenant un lien pour finaliser ton authentification");
-    return;
+    }
 }
 
 
-export async function reMember(member : GuildMember) {
+export async function welcomeUser(member : GuildMember) {
 
     console.log (`welcoming user ${member.user.tag}`);
     // we don't care about bots

@@ -6,9 +6,8 @@ export class RootController extends CrudController {
         throw new Error("Method not implemented.");
     }
 
-    public async read(_req: Request<import("express-serve-static-core").ParamsDictionary>, _res: Response): Promise<void> {
-        throw new Error ("toto");
-        //res.send ("Welcome to MensaBot, nothing to see here");
+    public async read(_req: Request<import("express-serve-static-core").ParamsDictionary>, res: Response): Promise<void> {
+        res.send ("Welcome to MensaBot, nothing to see here");
 
     }
 

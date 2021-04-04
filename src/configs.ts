@@ -30,6 +30,7 @@ export const configs = {
 	},
 	server : {
 		baseUrl :         assert_exists ("BASE_URL"),
+		port    : process.env.PORT || 4000,
 		validation_path : assert_exists ("VALIDATION_PATH")
 	},
 	sentry : {

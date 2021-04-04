@@ -5,7 +5,6 @@ import { configs } from './configs';
  * Express server
  */
 import * as express from 'express';
-import { PORT } from './server/config/constants';
 import { validationRouter, setupRouter, rootRouter } from './server/routes';
 
 const app = express();
@@ -65,13 +64,15 @@ client.on('ready', () => {
   });
   
 client.on('message', chatbot.handleIncomingMessage);
-client.on('guildMemberAdd', chatbot.reMember);
+client.on('error', Sentry.captureException);
+client.on('guildCreate', chatbot.newGuild);
+client.on('guildMemberAdd', chatbot.welcomeUser);
 client.login(configs.botToken); 
 
 /**
  * Booting server
  */
 
-app.listen(PORT, () => {
-    console.log(`Server is listening on port ${PORT}`);
+app.listen(configs.server.port, () => {
+    console.log(`Server is listening on port ${configs.server.port}`);
 });

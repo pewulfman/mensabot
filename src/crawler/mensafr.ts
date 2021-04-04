@@ -4,20 +4,21 @@ import {configs as conf} from '../configs'
 import * as cheerio    from 'cheerio'
 import * as needle     from 'needle'
 
-async function getToken () : Promise<string | undefined> {
+async function getToken (tries = 0, maxTries = 3) : Promise<string> {
     const resp =
         await needle("get","https://auth.mensa-france.net/");
 
     if(resp.statusCode === 200) {
         const $ = cheerio.load(resp.body);
-    const token = $('#token').attr('value');
-    return token
-    } 
-    throw new Error ("can't access authentification portail")
-
+        const token = $('#token').attr('value');
+        if (!token) throw new Error (`cannot get csrf token`)
+        return token
+    }
+    if (tries == maxTries) throw new Error ("can't access authentification portail")
+    return await getToken (tries + 1, maxTries);
 }
 
-async function getAuthCookies () {
+async function getAuthCookies (tries = 0, maxTries = 3) : Promise <{[name : string] : any} > {
     console.log ("geting cookie");
     const token = await getToken ();
     const resp = 
@@ -26,7 +27,9 @@ async function getAuthCookies () {
              user:conf.mensa_fr_db.userid,
              password:conf.mensa_fr_db.password
             });
-    return resp.cookies
+    if (resp.statusCode === 200 && resp.cookies) return resp.cookies
+    if (tries = maxTries) throw new Error ("cant't authentify to mensaFr");
+    return await getAuthCookies (tries+1,maxTries);
 }
 
 function isActive (html : cheerio.Cheerio) {
@@ -41,28 +44,40 @@ function isActive (html : cheerio.Cheerio) {
     let color = match[1];
     if (color == redcolor) return false
     if (color == greencolor) return true
-    throw new Error("unknown color")
+    throw new Error("unknown color, cannot estimate membership");
 }
 
-export async function getMemberInfo(mensaId:number, cookies : any | undefined) {
+interface UserData {
+    name       : string,
+    email      : string,
+    region     : string,
+    membership : boolean
+}
+/**
+ * throws errors
+ * @param mensaId 
+ * @param cookies 
+ * @returns 
+ */
+export async function getMemberInfo(mensaId:number, cookies? : any, tries = 0, maxTries = 3) : Promise<UserData> {
 
     console.log ("Getting info for member :" + mensaId)
 
     const infoPageUrl = conf.mensa_fr_db.url + mensaId;
     
     if (cookies == undefined) {
-        console.log ("cookies unknown")
+        console.log ("cookies unset")
         cookies = await getAuthCookies();
         console.log ("new cookies " + cookies);
     }
-    try {
-        console.log ("Get : " + infoPageUrl);
-        let resp = await needle ("get", infoPageUrl,{cookies});
-        console.log ("response" + resp.statusCode)
+    console.log ("Fetching page : " + infoPageUrl);
+    let resp = await needle ("get", infoPageUrl,{cookies});
+    console.log ("response" + resp.statusCode)
+    if (resp.statusCode === 200) {
         const $ = cheerio.load(resp.body);
         let identity = $('#identite').text().match(/(?:Monsieur|Madame) (?<name>[a-zA-Z- ]+) - [0-9]+ - (?<region>[A-Z]+)/);
         if (!identity) {
-            throw new Error ()
+            throw new Error (`Can't retrive identity`);
         }
         let name = identity.groups!['name'];
         let region = identity.groups!['region'];
@@ -71,10 +86,6 @@ export async function getMemberInfo(mensaId:number, cookies : any | undefined) {
         console.log('Found member info: ' + name + ' - ' + region + ' - ' + email + ' - ' + membership);
         return {name,email,region,membership}
     }
-    catch (err) {
-        throw err 
-    }
-
-
-
+    if (tries == maxTries) throw new Error (`Can't access member page`);
+    return await getMemberInfo (mensaId,undefined,tries+1,maxTries)
 }
