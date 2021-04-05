@@ -16,27 +16,24 @@ export async function promote(discordId : string, discordTag:string) {
     console.log (`Promoting user ${discordTag}`)
 
     let user = await client.users.resolve (discordId);
-    console.log (user);
-    if (user == null) console.log (`user not found`)
+    if (!user) Sentry.captureException (new Error (`User with ${discordId} not found on discord`));
     // get list of guild the user is part of.
     let guild_lst = client.guilds.cache.filter (
         guild => guild.members.resolve (user!) != null
     ).keyArray ()
-    console.log(guild_lst);
 
     // we fetch all roles that we know
     let guilds_info = await prisma.guild.findMany({where:{discordId:{in : guild_lst}}});
 
-    // log.debug(roles);
+    console.log (`${user!.username} is a member of ${guilds_info.map (guild_info => guild_info.name)}`)
     guilds_info.map(guild_info => promoteInGuild(user!,guild_info) );
 }
 
-async function promoteInGuild(user:Discord.User,guild_info:guild) {
+export async function promoteInGuild(user:Discord.User,guild_info:guild) {
 
-    console.log (`Give roles ${guild_info.roleTag} to user ${user.username} in server ${guild_info.discordId}`)
+    console.log (`Promote user ${user.username} in Guild ${guild_info.name}`);
     const guild = await client.guilds.fetch(guild_info.discordId);
     if (! guild) {
-        //log.error("Error404: Guild " + guild_info.discordTag + " not found !!!",guild);
         console.log (`Guild ${guild_info.name} not found`)
         return;
     }
@@ -48,21 +45,22 @@ async function promoteInGuild(user:Discord.User,guild_info:guild) {
         return;
     }
 
-    const discordRole = await guild.roles.fetch(guild_info.roleTag);
+    const discordRole = await guild.roles.fetch(guild_info.roleId);
     if (! discordRole) {
         //log.error("Role " + guild_info.roleTag + " not found in guild " + guild.name,guild);
-        console.log (`Role ${guild_info.roleTag} not found in guild`)
+        console.log (`Role ${guild_info.roleId} not found in guild`)
         return;
     }
-    // console.log('=== The Role ===\n', discordRole);
+    console.log (`Give roles ${discordRole.name} to user ${user.username} in server ${guild.name}`)
     try {
-        member.roles.add(discordRole)
-            .then(() => {
-                member.send ("Je viens de vous donner le rôle **" + discordRole.name + "** sur le serveur **" + guild.name + "**");
-            });        
+        await member.roles.add(discordRole);
+        member.send (`Je viens de vous donner le rôle **${discordRole.name}** sur le serveur **${guild.name}**`);
     } catch (e) {
         let id = Sentry.captureException(e);
-        guild.owner?.send(`Error trying to give role to member. be sure that I have the "give role" permission and that my role is above the "<auth>" role that I should give. If the problem persist, contact the admin and give the error ${id}`)
+        let owner = await guild.members.fetch (guild.ownerID);
+        owner.send(`Error trying to give role to member. be sure that I have the "give role" permission and that my role is above the "<auth>" role that I should give. If the problem persist, contact the admin and give the error ${id}`)
+        user.send (`Je n'ai pas pu te donner le role **${discordRole.name}** sur le serveur **{$guild.name}**. L'admin a été averti, il devrait résoudre le problème sous peu`)
+        console.log (`Issue ${id} forwarded to Sentry`)
     }
 }
 
@@ -76,13 +74,13 @@ export async function demote(discordTag:string) {
     ).keyArray ()
 
     // we fetch all roles that we know
-    let guilds_info = await prisma.guild.findMany({select:{discordId:true,roleTag:true},where:{discordId:{in : guild_lst}}});
+    let guilds_info = await prisma.guild.findMany({select:{discordId:true,roleId:true},where:{discordId:{in : guild_lst}}});
 
     // log.debug(roles);
     guilds_info.map(guild_info => demoteInGuild(user,guild_info) );
 }
 
-async function demoteInGuild(user:Discord.User,guild_info:{discordId:string,roleTag:string}) {
+async function demoteInGuild(user:Discord.User,guild_info:{discordId:string,roleId:string}) {
 
     const guild = await client.guilds.fetch(guild_info.discordId);
     if (! guild) {
@@ -105,7 +103,7 @@ async function demoteInGuild(user:Discord.User,guild_info:{discordId:string,role
         return;
     }
 
-    const discordRole = await guild.roles.fetch(guild_info.roleTag);
+    const discordRole = await guild.roles.fetch(guild_info.roleId);
     if (! discordRole) {
         //log.error("Role " + guild_info.roleTag + " not found in guild " + guild.name,guild);
         return;

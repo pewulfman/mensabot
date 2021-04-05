@@ -58,15 +58,26 @@ app.use (function errorHandler(_err : any, _req : any, res : express.Response, _
 
 import { client } from './discord/client'
 import * as chatbot from './discord/chatbot'
+import { Guild } from 'discord.js';
+import { prisma } from './postgre';
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user!.tag}!`);
   });
-  
-client.on('message', chatbot.handleIncomingMessage);
-client.on('error', Sentry.captureException);
-client.on('guildCreate', chatbot.newGuild);
+
+client.on('guildCreate', chatbot.newGuild );
+client.on('guildUpdate', (_old : Guild, guild : Guild) => {
+  prisma.guild.update ({where:{discordId:guild.id},data:{name:guild.name}})
+})
+client.on('guildRemove', (guild : Guild) => {
+  prisma.guild.delete ({where:{discordId:guild.id}})
+});
 client.on('guildMemberAdd', chatbot.welcomeUser);
+
+client.on('message', chatbot.handleIncomingMessage);
+
+client.on('error', Sentry.captureException);
+
 client.login(configs.botToken); 
 
 /**

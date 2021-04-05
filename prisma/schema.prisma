@@ -16,29 +16,15 @@ model members {
   email       String
   region      String
   mensaId     Int @unique
-  discordId   String @unique
-  discordTag  String @unique
   membership  Boolean
   inter       Boolean
+  discordId   String?
+  code        String?
 }
 
-model pendingMembers {
-  id          Int @default(autoincrement()) @id
-  name        String
-  email       String
-  region      String
-  mensaId     Int @unique
-  discordId   String @unique
-  discordTag  String @unique
-  membership  Boolean
-  code        String
-  trials      Int
-  inter       Boolean
-}
- 
 model guild {
   id         Int @default(autoincrement()) @id
   name       String
   discordId  String @unique
-  roleTag    String
+  roleId     String
 }

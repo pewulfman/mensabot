@@ -27,7 +27,7 @@ async function getAuthCookies (tries = 0, maxTries = 3) : Promise <{[name : stri
              user:conf.mensa_fr_db.userid,
              password:conf.mensa_fr_db.password
             });
-    if (resp.statusCode === 200 && resp.cookies) return resp.cookies
+    if (resp.statusCode === 302 && resp.cookies) return resp.cookies
     if (tries = maxTries) throw new Error ("cant't authentify to mensaFr");
     return await getAuthCookies (tries+1,maxTries);
 }
@@ -70,9 +70,9 @@ export async function getMemberInfo(mensaId:number, cookies? : any, tries = 0, m
         cookies = await getAuthCookies();
         console.log ("new cookies " + cookies);
     }
-    console.log ("Fetching page : " + infoPageUrl);
+    console.log (`Fetching page : ${infoPageUrl}`);
     let resp = await needle ("get", infoPageUrl,{cookies});
-    console.log ("response" + resp.statusCode)
+    console.log (`response ${resp.statusCode}`)
     if (resp.statusCode === 200) {
         const $ = cheerio.load(resp.body);
         let identity = $('#identite').text().match(/(?:Monsieur|Madame) (?<name>[a-zA-Z- ]+) - [0-9]+ - (?<region>[A-Z]+)/);
