@@ -5,7 +5,7 @@ import { configs } from './configs';
  * Express server
  */
 import * as express from 'express';
-import { validationRouter, setupRouter, rootRouter } from './server/routes';
+import { validationRouter, setupRouter, rootRouter, installRouter } from './server/routes';
 
 const app = express();
 app.use(express.json());
@@ -39,6 +39,7 @@ app.use(Sentry.Handlers.requestHandler());
 app.use(Sentry.Handlers.tracingHandler());
 
 app.use(configs.server.validation_path, validationRouter);
+app.use('/install',installRouter);
 app.use('/setup', setupRouter);
 app.use('/', rootRouter);
 
