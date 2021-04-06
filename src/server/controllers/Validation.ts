@@ -22,7 +22,7 @@ export class ValidationController extends CrudController {
         code    = code as string;
         console.log (`MensaId is ${mensaId}`);
 
-        let pending = await prisma.members.findFirst ({where:{AND:[{mensaId},{code},]}});
+        let pending = await prisma.members.findFirst ({where:{AND:[{mensaId},{discord:{code}},]},include:{discord:true}});
         if (!pending) {
             res.send (`Code invalide.
                        Si vous n'étes pas déjà authentifier et que le problème persiste, recommence la procédure de zéro, puis contacte l'administrateur`);
@@ -30,13 +30,13 @@ export class ValidationController extends CrudController {
         };
         
         // Validating user
-        await prisma.members.update ({where:{id:pending.id},data:{code: {set:null}}});
+        await prisma.discord.update ({where:{id:pending.discord!.id},data:{code: {set:null}}});
 
-        if (pending.discordId) {
-            let discordUser = await client.users.fetch (pending.discordId);
+        if (pending.discord) {
+            let discordUser = await client.users.fetch (pending.discord.discordId);
             //promote users
             if (pending.membership) { 
-                discord.roles.promote(pending.discordId,discordUser.tag)
+                discord.roles.promote(pending.discord.discordId,discordUser.tag)
                 discordUser.send (`Ton identité à été validé, as bientôt sur discord (^^)`);
             } else {
                 discordUser.send (`Ton identité à été validé, as bientôt sur discord (^^), cependant tu n'es pas à jour de cotisation. Tu auras accés au serveur quand tu recotisera`);

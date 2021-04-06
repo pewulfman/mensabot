@@ -38,12 +38,13 @@ export async function handleIncomingMessage(message : Message) {
 
     // Check if this is an authentified user
     const theUser = await prisma.members.findFirst ({
-        where : {discordId : message.author.id},
+        where : {discord: {discordId : message.author.id}},
+        include : {discord : true}
     })
 
-    if (theUser) {
+    if (theUser && theUser.discord) {
         //membre en attente d'authentification
-        if (theUser.code) message.author.send("Je vous ai envoyer un mail pour vérifier votre identiter, vérifiez votre boite mail.")
+        if (theUser.discord.code) message.author.send("Je vous ai envoyer un mail pour vérifier votre identiter, vérifiez votre boite mail.")
         //membre authentifié
         else message.author.send("Bonjour, je vous ai déjà authentifier, je n'ai plus rien à faire");
         return;
@@ -60,8 +61,9 @@ export async function handleIncomingMessage(message : Message) {
     // check if we already have that number
     const checkUser = await prisma.members.findUnique ({
         where: {mensaId},
+        include : {discord:true},
     });
-    if (checkUser && checkUser.discordId) {
+    if (checkUser && checkUser.discord) {
         message.author.send("Un autre utilisateur est déjà authentifier avec ce numero. S'il y a un soucis, veuillez contacter un administrateur");
         return;
     }
@@ -82,8 +84,12 @@ export async function handleIncomingMessage(message : Message) {
                 mensaId,
                 membership : memberInfo.membership,
                 inter      : false,
-                discordId  : message.author.id,
-                code       : new_code,
+                discord    : {
+                    create : {
+                        discordId : message.author.id,
+                        code      : new_code,
+                    }
+                }
             },
         });
 
@@ -105,8 +111,8 @@ export async function welcomeUser(member : GuildMember) {
     if (member.user.bot) return;
 
     // check we know that user
-    let theUser = await prisma.members.findFirst({where:{discordId:member.user.id}});
-    if (theUser && !theUser.code) {
+    let theUser = await prisma.members.findFirst({where:{discord:{discordId:member.user.id}},include:{discord:true}});
+    if (theUser && ! theUser.discord!.code) {
         let guild_info = await prisma.guild.findUnique({where:{discordId:member.guild.id}})
         if (!guild_info) {
             member.guild.owner!.send (`I don't have your guild in my db. You probably, haven't done seting up your guild yet`)

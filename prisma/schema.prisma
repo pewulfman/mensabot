@@ -11,19 +11,26 @@ generator client {
 }
 
 model members {
-  id          Int @default(autoincrement()) @id
+  id          Int     @default(autoincrement()) @id
   name        String
   email       String
   region      String
-  mensaId     Int @unique
+  mensaId     Int     @unique
   membership  Boolean
   inter       Boolean
-  discordId   String?
+  discord     discord?
+}
+
+model discord {
+  id          Int     @default(autoincrement()) @id
+  discordId   String
   code        String?
+  member      members @relation(fields: [memberId], references:[id])    
+  memberId    Int     @unique
 }
 
 model guild {
-  id         Int @default(autoincrement()) @id
+  id         Int    @default(autoincrement()) @id
   name       String
   discordId  String @unique
   roleId     String
