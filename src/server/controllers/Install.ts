@@ -1,4 +1,4 @@
-import { Request, Response, urlencoded } from 'express';
+import { Request, Response } from 'express';
 import { configs } from '../../configs';
 import { CrudController } from './CrudController';
 
@@ -11,7 +11,7 @@ export class InstallController extends CrudController {
         console.log ("received install request");
         res.redirect (
             encodeURI(
-                `https://discord.com/api/oauth2/authorize?client_id=819258671107407903&permissions=8&redirect_uri=${configs.server.baseUrl}/setup&response_type=code&scope=guilds%20bot`
+                `https://discord.com/api/oauth2/authorize?client_id=819258671107407903&permissions=8&redirect_uri=${configs.server.baseUrl}/setup&response_type=code&scope=guilds&bot`
             )
         );
     }
