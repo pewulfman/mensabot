@@ -8,7 +8,8 @@ import * as express from 'express';
 import { validationRouter, setupRouter, rootRouter, installRouter } from './server/routes';
 
 const app = express();
-app.use(express.json());
+app.use(express.json()) // for parsing application/json
+app.use(express.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 
 /**
  * Sentry
@@ -65,7 +66,9 @@ client.on('ready', () => {
     console.log(`Logged in as ${client.user!.tag}!`);
   });
 
+/*
 client.on('guildCreate', chatbot.newGuild );
+*/
 client.on('guildUpdate', (_old : Guild, guild : Guild) => {
   prisma.guild.update ({where:{discordId:guild.id},data:{name:guild.name}})
 })

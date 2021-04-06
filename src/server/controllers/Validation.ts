@@ -30,19 +30,19 @@ export class ValidationController extends CrudController {
         };
         
         // Validating user
-        await prisma.members.update ({where:{id:pending.id},data:{code:undefined}});
+        await prisma.members.update ({where:{id:pending.id},data:{code: {set:null}}});
 
         if (pending.discordId) {
             let discordUser = await client.users.fetch (pending.discordId);
-            discordUser.send (`Ton identité à été validé, as bientôt sur discord (^^)`);
             //promote users
             if (pending.membership) { 
                 discord.roles.promote(pending.discordId,discordUser.tag)
-                res.send("Ton identité à été validé, tu devrais maintenant avoir accées aux contenu des discords")
+                discordUser.send (`Ton identité à été validé, as bientôt sur discord (^^)`);
             } else {
-                res.send("Ton identité à été validé, cependant tu n'es pas à jour de cotisation. Tu auras accés au serveur quand tu recotisera")
+                discordUser.send (`Ton identité à été validé, as bientôt sur discord (^^), cependant tu n'es pas à jour de cotisation. Tu auras accés au serveur quand tu recotisera`);
             }
         }
+        res.redirect (`https://discord.com/channels/@me/827231210816012358`);
     }
 
     public update(_req: Request<import("express-serve-static-core").ParamsDictionary>, _res: Response): void {

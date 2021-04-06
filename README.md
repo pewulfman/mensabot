@@ -23,9 +23,9 @@ Here a the main modules used in this small application:
 
 ### UC001: Clean up the authentification
 1. ~~rework chatbot~~
-1. ~~ small server to receive verification code~~
-1. ~~ Following mensa membership to promote and demote user~~
-1. Make setting up flow
+1. ~~small server to receive verification code~~
+1. ~~Following mensa membership to promote and demote user~~
+1. ~~Make setting up flow~~
 1. ~~Send warning to guild owner~~
 1. ~~better logger~~
 1. Write Maintenance Task (Check everyday for promotion and demotion)

@@ -4,11 +4,9 @@ import { setupController } from '../controllers';
 export const router = Router({
     strict: true
 });
-/*
-router.post('/', (req: Request, res: Response) => {
-    validationController.create(req, res);
+router.post('/', (req: Request, res: Response, next) => {
+    setupController.create(req, res).catch (next);
 });
-*/
 
 router.get('/', (req: Request, res: Response, next) => {
     setupController.read(req, res).catch (next);

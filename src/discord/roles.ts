@@ -128,7 +128,7 @@ async function demoteInGuild(user:Discord.User,guild_info:{discordId:string,role
 //warn the user when the order of bot vs manage role is reverse
 export async function checkOrder (oldRole : Discord.Role, newRole : Discord.Role) {
     //check that we updated the bot role
-    if (newRole.name == client.user!.username) {
+    if (newRole.name == (await client.fetchApplication()).name) {
         console.log (`catch role update with role ${oldRole} => ${newRole}`)
 
         let guild = newRole.guild;
