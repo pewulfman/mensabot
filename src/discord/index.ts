@@ -1,5 +1,9 @@
+import { client } from './client'
+import * as chatbot from './chatbot'
 import * as roles from './roles'
 
 export {
-    roles
+    client,
+    chatbot,
+    roles,
 }

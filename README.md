@@ -26,7 +26,8 @@ Here a the main modules used in this small application:
 1. ~~ small server to receive verification code~~
 1. ~~ Following mensa membership to promote and demote user~~
 1. Make setting up flow
-1. ~~replace logger~~
+1. ~~Send warning to guild owner~~
+1. ~~better logger~~
 1. Write Maintenance Task (Check everyday for promotion and demotion)
 ### UC002: Support international members
 1. Write bilingual messages

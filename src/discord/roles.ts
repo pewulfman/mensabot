@@ -124,3 +124,26 @@ async function demoteInGuild(user:Discord.User,guild_info:{discordId:string,role
             console.log(member.roles.cache);
         });
 }
+
+//warn the user when the order of bot vs manage role is reverse
+export async function checkOrder (oldRole : Discord.Role, newRole : Discord.Role) {
+    //check that we updated the bot role
+    if (newRole.name == client.user!.username) {
+        console.log (`catch role update with role ${oldRole} => ${newRole}`)
+
+        let guild = newRole.guild;
+        let guild_info = await prisma.guild.findUnique ({where:{discordId:guild.id}});
+        if (! guild_info) { 
+            console.log (`Guild ${guild.id} not found`);
+            return 
+        };
+        let managed_role = await guild.roles.fetch(guild_info.roleId);
+        if (! managed_role) { 
+            guild.owner!.send ('You deleted the authorized role, process to setup the bot again');
+            return
+        }
+        if (managed_role.rawPosition >= newRole.rawPosition) {
+            guild.owner!.send (`The order of ${newRole.name} role and ${managed_role.name} is wrong.\n Be sure to leave that ${newRole.name} appears before ${managed_role.name} in the role order`)
+        } 
+    }
+}

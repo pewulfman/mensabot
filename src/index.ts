@@ -56,10 +56,9 @@ app.use (function errorHandler(_err : any, _req : any, res : express.Response, _
  * Discord bot startup
  */
 
-import { client } from './discord/client'
-import * as chatbot from './discord/chatbot'
 import { Guild } from 'discord.js';
 import { prisma } from './postgre';
+import { chatbot, client, roles } from './discord';
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user!.tag}!`);
@@ -72,7 +71,10 @@ client.on('guildUpdate', (_old : Guild, guild : Guild) => {
 client.on('guildRemove', (guild : Guild) => {
   prisma.guild.delete ({where:{discordId:guild.id}})
 });
+
 client.on('guildMemberAdd', chatbot.welcomeUser);
+
+client.on('roleUpdate', roles.checkOrder);
 
 client.on('message', chatbot.handleIncomingMessage);
 
