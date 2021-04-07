@@ -23,7 +23,7 @@ model members {
 
 model discord {
   id          Int     @default(autoincrement()) @id
-  discordId   String
+  discordId   String  
   code        String?
   member      members @relation(fields: [memberId], references:[id])    
   memberId    Int     @unique

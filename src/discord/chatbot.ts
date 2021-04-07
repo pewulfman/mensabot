@@ -1,4 +1,4 @@
-import {GuildMember, Message, Guild} from 'discord.js'
+import {Message, Guild} from 'discord.js'
 import * as Sentry from "@sentry/node";
 import * as mensafr from '../crawler/mensafr'
 import * as fs         from 'fs'
@@ -7,7 +7,6 @@ import { client } from './client.js'
 import { prisma } from '../postgre'
 import { sendValidationUrl } from '../mailer';
 import { generateCode, generateUrl } from '../auth';
-import { roles } from '.';
 
 
 export async function newGuild (guild : Guild) {
@@ -101,33 +100,6 @@ export async function handleIncomingMessage(message : Message) {
         console.log (`error ${id} sended to Senty`)
 
     }
-}
-
-
-export async function welcomeUser(member : GuildMember) {
-
-    console.log (`welcoming user ${member.user.tag}`);
-    // we don't care about bots
-    if (member.user.bot) return;
-
-    // check we know that user
-    let theUser = await prisma.members.findFirst({where:{discord:{discordId:member.user.id}},include:{discord:true}});
-    if (theUser && ! theUser.discord!.code) {
-        let guild_info = await prisma.guild.findUnique({where:{discordId:member.guild.id}})
-        if (!guild_info) {
-            member.guild.owner!.send (`I don't have your guild in my db. You probably, haven't done seting up your guild yet`)
-            return;
-        }
-        roles.promoteInGuild(member.user,guild_info);
-        return;
-    }
-
-    const message = fs.readFileSync('./messages/welcome.txt', 'utf-8')
-        .replace(/##username##/g, member.user.username)
-        .replace(/##guild##/g,    member.guild.name)
-
-    member.send (message);
-
 }
 
 

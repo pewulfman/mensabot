@@ -11,7 +11,7 @@ export class InstallController extends CrudController {
         console.log ("received install request");
         res.redirect (
             encodeURI(
-                `https://discord.com/api/oauth2/authorize?client_id=819258671107407903&permissions=8&redirect_uri=${configs.server.baseUrl}/setup&response_type=code&scope=guilds&bot`
+                `https://discord.com/api/oauth2/authorize?client_id=819258671107407903&permissions=8&redirect_uri=${configs.server.baseUrl}/setup&response_type=code&scope=guilds bot`
             )
         );
     }

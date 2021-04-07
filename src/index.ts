@@ -60,23 +60,22 @@ app.use (function errorHandler(_err : any, _req : any, res : express.Response, _
 
 import { Guild } from 'discord.js';
 import { prisma } from './postgre';
-import { chatbot, client, roles } from './discord';
+import { chatbot, client, guild, roles } from './discord';
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user!.tag}!`);
   });
 
-/*
-client.on('guildCreate', chatbot.newGuild );
-*/
 client.on('guildUpdate', (_old : Guild, guild : Guild) => {
-  prisma.guild.update ({where:{discordId:guild.id},data:{name:guild.name}})
+  prisma.guild.update ({where:{discordId:guild.id},data:{name:guild.name}}).then();
 })
-client.on('guildRemove', (guild : Guild) => {
+client.on('guildDelete', (guild : Guild) => {
+  console.log (`remove guild ${guild.name}`);
   prisma.guild.delete ({where:{discordId:guild.id}})
+    .then (() => console.log (`deleted`))
 });
 
-client.on('guildMemberAdd', chatbot.welcomeUser);
+client.on('guildMemberAdd', guild.newMember);
 
 client.on('roleUpdate', roles.checkOrder);
 

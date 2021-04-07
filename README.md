@@ -5,7 +5,7 @@ A Discord bot for Mensa-France.
 Forked from [Mensa-PLO bot](https://github.com/slesolliec/mensabot)
 
 To invite the bot in your server, go to 
-https://discord.com/api/oauth2/authorize?client_id=819258671107407903&permissions=8&scope=bot
+https://mensafrbot.herokuapp.com/install
 
 This is currently a test ground for playing with nodeJS and Discord.
 
