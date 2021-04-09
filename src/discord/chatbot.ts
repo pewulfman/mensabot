@@ -37,10 +37,9 @@ export async function handleIncomingMessage(message : Message) {
 
     // Check if this is an authentified user
     const theUser = await prisma.members.findFirst ({
-        where : {discord: {discordId : message.author.id}},
-        include : {discord : true}
-    })
-
+        where: {discord:{discordId:message.author.id}},
+        include:{discord:true}
+    });
     if (theUser && theUser.discord) {
         //membre en attente d'authentification
         if (theUser.discord.code) message.author.send("Je vous ai envoyer un mail pour vérifier votre identiter, vérifiez votre boite mail.")
@@ -72,12 +71,13 @@ export async function handleIncomingMessage(message : Message) {
         const memberInfo = await mensafr.getMemberInfo (mensaId);
         const new_code   = generateCode () ;
         const new_url    = generateUrl (mensaId,new_code);
-        sendValidationUrl (memberInfo.name,memberInfo.email,new_url);
+        sendValidationUrl ([memberInfo.lastname,memberInfo.firstname].join(" "),memberInfo.email,new_url);
 
         // we store the user in the pending member
         await prisma.members.create ({
             data:{
-                name       : memberInfo.name,
+                name       : memberInfo.lastname,
+                firstname  : memberInfo.firstname,
                 email      : memberInfo.email,
                 region     : memberInfo.region,
                 mensaId,

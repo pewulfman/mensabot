@@ -13,6 +13,7 @@ generator client {
 model members {
   id          Int     @default(autoincrement()) @id
   name        String
+  firstname   String
   email       String
   region      String
   mensaId     Int     @unique
