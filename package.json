@@ -4,8 +4,8 @@
   "description": "A simple bot for Mensa discord server.",
   "main": "index.js",
   "scripts": {
-    "start": "node dist/index.js",
-    "build": "tsc"
+    "build": "npx prisma generate && tsc",
+    "start": "node dist/index.js"
   },
   "keywords": [
     "Discord",
