@@ -69,7 +69,7 @@ export async function getMemberInfo(mensaId:number, cookies? : any, tries = 0, m
         let lastname = identity.groups!['lastname'];
         let region = identity.groups!['region'];
         let email = $('div.email a').text();
-        let membership = await checkMembershipOne (mensaId, firstname,lastname,cookies);
+        let membership = await checkMembershipOne (mensaId,email,cookies);
         console.log(`Found member info: + ${firstname} ${lastname} - ${region} - ${email} - ${membership}`);
         return {firstname,lastname,email,region,membership}
     }
@@ -77,7 +77,7 @@ export async function getMemberInfo(mensaId:number, cookies? : any, tries = 0, m
     return await getMemberInfo (mensaId,undefined,tries+1,maxTries)
 }
 
-export async function checkMembershipOne (mensaId: number,firstname : string,lastname : string, cookies? : any, tries = 0, maxTries = 3) : Promise<boolean> {
+export async function checkMembershipOne (mensaId: number,email : string, cookies? : any, tries = 0, maxTries = 3) : Promise<boolean> {
     let member = false
     if (cookies == undefined) {
         console.log ("cookies unset")
@@ -85,7 +85,7 @@ export async function checkMembershipOne (mensaId: number,firstname : string,las
         console.log ("new cookies " + cookies);
     }
     const membersSearchQuery =
-        `https://mensa-france.net/membres/annuaire/?recherche=(prenom:${firstname})(nom:${lastname})(region:all)(cotisation:oui)`
+        `https://mensa-france.net/membres/annuaire/?recherche=(region:all)(type_contact:mail)(contact:${email})(cotisation:oui)`
 
     console.log(`Fetching page : ${membersSearchQuery}`);
     let resp = await needle ("get", membersSearchQuery, {cookies});
@@ -100,5 +100,5 @@ export async function checkMembershipOne (mensaId: number,firstname : string,las
        return member
     }
     if (tries == maxTries) throw new Error (`Can't access member page`);
-    return await checkMembershipOne (mensaId,firstname, lastname,undefined,tries+1,maxTries)
+    return await checkMembershipOne (mensaId,email,undefined,tries+1,maxTries)
 }

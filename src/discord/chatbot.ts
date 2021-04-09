@@ -76,10 +76,6 @@ export async function handleIncomingMessage(message : Message) {
         // we store the user in the pending member
         await prisma.members.create ({
             data:{
-                name       : memberInfo.lastname,
-                firstname  : memberInfo.firstname,
-                email      : memberInfo.email,
-                region     : memberInfo.region,
                 mensaId,
                 membership : memberInfo.membership,
                 inter      : false,
