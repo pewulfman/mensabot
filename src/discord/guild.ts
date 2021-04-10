@@ -9,7 +9,7 @@ export async function process (guild : discord.Guild) {
     if (! guild_info) { 
         throw new Error (`Processing guild ${guild.name} while not in db`);
     }
-    let members = (await guild.members.fetch()).filter( m => m != guild.owner);
+    let members = await guild.members.fetch();
     members.forEach(m => updateMembership(m,guild_info!))
 }
 
