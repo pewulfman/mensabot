@@ -51,6 +51,10 @@ export async function promoteInGuild(user:Discord.User,guild_info:guild) {
         guild.owner!.send (`Warning : I can't find the authenticated role. If you have deleted it, try install the bot again`)
         return;
     }
+    if ( member.roles.cache.find (role => role == discordRole)) {
+        console.log (`Member ${member.user.username} of guild ${guild.name} already have role ${discordRole.name}`)
+        return;
+    }
 
     if ( ! guild.me!.hasPermission('MANAGE_ROLES')) {
         console.log (`I don't have the permission on the guild ${guild.name}`)
