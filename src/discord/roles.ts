@@ -140,7 +140,7 @@ export async function demoteInGuild(user:Discord.User,guild_info:guild) {
 }
 
 //warn the user when the order of bot vs manage role is reverse
-export async function checkOrder (oldRole : Discord.Role, newRole : Discord.Role) {
+export async function checkOrder (oldRole : Discord.Role, newRole : Discord.Role,silent=false) {
     //check that we updated the bot role
     if (newRole.name == (await client.fetchApplication()).name) {
         console.log (`catch role update with role ${oldRole} => ${newRole}`)
@@ -153,11 +153,11 @@ export async function checkOrder (oldRole : Discord.Role, newRole : Discord.Role
         };
         let managed_role = await guild.roles.fetch(guild_info.roleId);
         if (! managed_role) { 
-            guild.owner!.send ('You deleted the authorized role, process to setup the bot again');
+            if (!silent) guild.owner!.send ('You deleted the authorized role, process to setup the bot again');
             return false
         }
         if (managed_role.rawPosition >= newRole.rawPosition) {
-            guild.owner!.send (`The order of ${newRole.name} role and ${managed_role.name} is wrong.\n Be sure to leave that ${newRole.name} appears before ${managed_role.name} in the role order`)
+            if (!silent) guild.owner!.send (`The order of ${newRole.name} role and ${managed_role.name} is wrong.\n Be sure to leave that ${newRole.name} appears before ${managed_role.name} in the role order`)
             return false
         } 
         Guild.process(guild) 

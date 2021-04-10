@@ -1,5 +1,6 @@
+import { Guild } from 'discord.js';
 import { Request, Response } from 'express';
-import { client } from '../../discord';
+import { client, roles } from '../../discord';
 import { prisma } from '../../postgre';
 import { CrudController } from './CrudController';
 
@@ -24,6 +25,7 @@ export class SetupController extends CrudController {
         res.send(`Setup done. One last thing: be sure to check that the role ${app_name} is above the role ${(await guild.roles.fetch(role_id as string))!.name} in the role list.\n Otherwise, I can't do my job properly\n. Don't worry Marvin will remind you to do this.\n more info : https://support.discord.com/hc/en-us/articles/214836687-Role-Management-101`)
         let marvin_role = guild.roles.cache.find(role => role.name == app_name);
         if (!marvin_role) throw new Error (`role ${app_name} doesn't exist on added guild ${guild.name}`);
+        if  (roles.checkOrder(marvin_role,marvin_role,true)) Guild
 
     }
 

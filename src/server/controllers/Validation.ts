@@ -42,7 +42,7 @@ export class ValidationController extends CrudController {
                 discordUser.send (`Ton identité à été validé, as bientôt sur discord (^^), cependant tu n'es pas à jour de cotisation. Tu auras accés au serveur quand tu recotisera`);
             }
         }
-        res.redirect (`https://discord.com/channels/@me/827231210816012358`);
+        res.redirect (`https://discord.com/channels/@me`);
     }
 
     public update(_req: Request<import("express-serve-static-core").ParamsDictionary>, _res: Response): void {

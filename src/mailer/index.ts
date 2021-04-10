@@ -1,17 +1,11 @@
 
 import {configs as conf} from '../configs'
 import * as fs         from 'fs'
-import * as nodemailer from 'nodemailer'
+import * as SendGrid   from '@sendgrid/mail'
 
-const transporter = nodemailer.createTransport({
-    host: conf.smtp.host,
-    port: 465,
-    secure: true, // true for 465, false for other ports
-    auth: {
-        user: conf.smtp.user,
-        pass: conf.smtp.password
-    }
-});
+
+SendGrid.setApiKey(conf.sendgrid.api_key);
+
 
 // send validation code via email
 export function sendValidationUrl(name : string, email : string, url :string) {
@@ -26,19 +20,14 @@ export function sendValidationUrl(name : string, email : string, url :string) {
 
     console.log (`message sent : ${msgMail}`);
 
-    const mailOptions = {
-        from:    'MensaBot <' + conf.smtp.user + '>',
+    const msg = {
+        from:    `MensaBot <mensabot@wulfman.fr>`,
         to:      email,
         subject: 'Votre code de confirmation MensaBot Discord',
         text:    msgMail
     };
-      
-    transporter.sendMail(mailOptions, function(error, info){
-        if (error) {
-            console.log (error);
-            throw Error ();
-        } else {
-            console.log('Email sent: ' + info.response);
-        }
-    });
+    SendGrid.send(msg)
+        .then((res) => {
+            console.log(`Email sent : ${res}`)
+        })
 }

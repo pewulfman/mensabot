@@ -23,15 +23,15 @@ export const configs = {
 		password: assert_exists ("MENSA_INTER_PASS"),
 		url :     assert_exists ("MENSA_INTER_URL")
 	},
-	smtp : {
-		host:     assert_exists ("SMTP_HOST"),
-		user:     assert_exists ("SMTP_USER"),
-		password: assert_exists ("SMTP_PASS") 
-	},
 	server : {
 		baseUrl :         assert_exists ("BASE_URL"),
-		port    : process.env.PORT || 4000,
+		port    :		  process.env.PORT || 4000,
 		validation_path : assert_exists ("VALIDATION_PATH")
+	},
+	sendgrid : {
+		api_key:  assert_exists ("SENDGRID_API_KEY"),
+		user:     assert_exists ("SENDGRID_USERNAME"),
+		password: assert_exists ("SENDGRID_PASSWORD") 
 	},
 	sentry : {
 		dsn : assert_exists ("SENTRY_DSN")

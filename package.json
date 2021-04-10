@@ -16,6 +16,7 @@
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^2.20.1",
+    "@sendgrid/mail": "^7.4.2",
     "@sentry/node": "^6.2.5",
     "@sentry/tracing": "^6.2.5",
     "cheerio": "^1.0.0-rc.3",
@@ -25,8 +26,7 @@
     "express": "^4.17.1",
     "fs": "0.0.1-security",
     "moment": "^2.26.0",
-    "needle": "^2.6.0",
-    "nodemailer": "^6.4.8"
+    "needle": "^2.6.0"
   },
   "devDependencies": {
     "@sentry/types": "^6.2.5",
