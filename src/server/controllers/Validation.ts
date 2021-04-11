@@ -25,7 +25,7 @@ export class ValidationController extends CrudController {
         let pending = await prisma.members.findFirst ({where:{AND:[{mensaId},{discord:{code}},]},include:{discord:true}});
         if (!pending) {
             res.send (`Code invalide.
-                       Si vous n'étes pas déjà authentifier et que le problème persiste, recommence la procédure de zéro, puis contacte l'administrateur`);
+                       Si vous n'étes pas déjà authentifié et que le problème persiste, recommence la procédure de zéro, puis contacte l'administrateur`);
             return;
         };
         
@@ -37,9 +37,9 @@ export class ValidationController extends CrudController {
             //promote users
             if (pending.membership) { 
                 discord.roles.promote(pending.discord.discordId,discordUser.tag)
-                res.send (`Ton identité à été validé, as bientôt sur discord (^^)`);
+                res.send (`Ton identité a été validé, à bientôt sur discord (^^)`);
             } else {
-                res.send (`Ton identité à été validé, as bientôt sur discord (^^), cependant tu n'es pas à jour de cotisation. Tu auras accés au serveur quand tu recotisera`);
+                res.send (`Ton identité a été validé, cependant tu n'es pas à jour de cotisation. Tu auras accés au serveur quand tu recotisera`);
             }
         }
         //res.redirect (`https://discord.com/channels/@me`);

@@ -88,11 +88,11 @@ export async function handleIncomingMessage(message : Message) {
             },
         });
 
-        message.author.send("J'ai bien enregistrer ta demande. Tu devrais recevoir un mail contenant un lien pour finaliser ton authentification");
+        message.author.send("J'ai bien enregistré ta demande. Tu devrais recevoir un mail contenant un lien pour finaliser ton authentification");
         return;
     } catch (err) {
         let id = Sentry.captureException(err);
-        message.author.send(`Il y a eu un soucis. Re-essaie et si ça persiste, tu peux contacter les admins en renseignant l'erreur ${id}`);
+        message.author.send(`Il y a eu un soucis. Ré-essaie et si ça persiste, tu peux contacter les admins en renseignant l'erreur ${id}`);
         console.log (`error ${id} sended to Senty`)
 
     }
