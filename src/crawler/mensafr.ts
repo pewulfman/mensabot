@@ -61,7 +61,7 @@ export async function getMemberInfo(mensaId:number, cookies? : any, tries = 0, m
     console.log (`response ${resp.statusCode}`)
     if (resp.statusCode === 200) {
         const $ = cheerio.load(resp.body);
-        let identity = $('#identite').text().match(/(?:Monsieur|Madame|Mademoiselle) (?<firstname>(?:[A-ZÉÈÊËÏ][a-zàéèêëçï]+[-. ]?)+) (?<lastname>[A-ZÉÈÊËÏ -]+) - [0-9]+ - (?<region>[A-Z]+)/);
+        let identity = $('#identite').text().match(/(?:Monsieur|Madame|Mademoiselle) (?<firstname>(?:[A-ZÉÈÊËÏ][a-zàéèêëçï]+[-. ]?)+) (?<lastname>[A-ZÉÈÊËÇÏ -]+) - [0-9]+ - (?<region>[A-Z]+)/);
         if (!identity) {
             throw new Error (`Can't retrive identity ${$('#identite').text()}`);
         }
